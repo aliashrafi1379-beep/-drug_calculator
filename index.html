@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>سامانه بالینی و محاسبات بیهوشی</title>
+  <title>سامانه تخصصی و محاسبات بیهوشی</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: #0b1329;
-      --card-bg: rgba(22, 33, 62, 0.75);
+      --bg: #090e1a;
+      --card-bg: rgba(19, 28, 49, 0.85);
       --card-border: rgba(56, 189, 248, 0.2);
       --accent: #38bdf8;
       --accent-glow: rgba(56, 189, 248, 0.35);
@@ -28,9 +28,9 @@
     }
 
     body {
-      background: radial-gradient(circle at top, #162447 0%, var(--bg) 100%);
+      background: radial-gradient(circle at top, #14213d 0%, var(--bg) 100%);
       color: var(--text);
-      padding: 14px;
+      padding: 12px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -38,7 +38,7 @@
 
     .header {
       text-align: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .badge {
@@ -50,22 +50,21 @@
       border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.5px;
     }
 
     .tab-bar {
       display: flex;
-      gap: 6px;
-      background: rgba(15, 23, 42, 0.6);
+      gap: 5px;
+      background: rgba(15, 23, 42, 0.7);
       padding: 5px;
       border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 12px;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 8px 4px;
+      padding: 9px 4px;
       border: none;
       background: transparent;
       color: var(--text-muted);
@@ -87,14 +86,14 @@
       border: 1px solid var(--card-border);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 14px;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
     }
 
     .input-group {
-      margin-bottom: 12px;
+      margin-bottom: 11px;
     }
 
     label {
@@ -130,38 +129,39 @@
     }
 
     .chip {
-      padding: 5px 10px;
+      padding: 5px 12px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       font-size: 11px;
       white-space: nowrap;
       cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
     }
 
     .chip.active {
       background: var(--accent);
       color: #04101e;
       font-weight: 600;
+      border-color: var(--accent);
     }
 
-    /* شبیه‌ساز سرنگ و انیمیشن قطره */
+    /* پمپ و سرنگ بصری */
     .pump-visualizer {
       background: #080f1e;
       border: 1px solid #1e293b;
       border-radius: 14px;
-      padding: 14px;
+      padding: 12px;
       margin: 12px 0;
-      position: relative;
     }
 
     .syringe-body {
       width: 100%;
-      height: 18px;
+      height: 16px;
       background: #1e293b;
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
-      position: relative;
       border: 1px solid #475569;
     }
 
@@ -176,7 +176,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 10px;
+      margin-top: 8px;
       gap: 8px;
     }
 
@@ -190,7 +190,7 @@
 
     @keyframes drip {
       0%, 100% { transform: translateY(0); opacity: 0.2; }
-      50% { transform: translateY(8px); opacity: 1; filter: drop-shadow(0 0 4px var(--accent)); }
+      50% { transform: translateY(7px); opacity: 1; filter: drop-shadow(0 0 4px var(--accent)); }
     }
 
     .result-box {
@@ -202,7 +202,7 @@
     }
 
     .rate-val {
-      font-size: 38px;
+      font-size: 36px;
       font-weight: 800;
       color: var(--accent);
       text-shadow: 0 0 16px var(--accent-glow);
@@ -221,55 +221,87 @@
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
 
+    /* کارت‌های دارو و آکاردئون */
     .drug-card {
       background: #0f172a;
-      border: 1px solid #334155;
-      padding: 12px;
+      border: 1px solid #283548;
       border-radius: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 9px;
+      overflow: hidden;
+      transition: border-color 0.2s;
     }
 
-    .drug-title {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--accent);
+    .drug-card:hover {
+      border-color: #38bdf8;
+    }
+
+    .drug-header {
+      padding: 12px;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .drug-title-text {
+      font-weight: 700;
+      font-size: 14px;
+      color: #f1f5f9;
+    }
+
+    .drug-en-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-family: monospace;
+    }
+
+    .drug-body {
+      padding: 0 12px 12px 12px;
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.7;
+      border-top: 1px dashed #1e293b;
+      margin-top: 6px;
+      padding-top: 10px;
+      display: none;
+    }
+
+    .drug-detail-row {
+      margin-bottom: 6px;
     }
 
     .badge-sub {
       font-size: 10px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.2);
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <span class="badge">سامانه اختصاصی بیهوشی</span>
-    <h3 style="margin-top: 6px; font-size: 17px;">محاسبات و پایشگر بالینی</h3>
+    <span class="badge">سامانه تخصصی چند ورق بیهوشی</span>
+    <h3 style="margin-top: 5px; font-size: 16px;">محاسبات و رفرنس بالینی داروها</h3>
   </div>
 
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="changeTab('tab-calc')">🧮 محاسبه پمپ</button>
-    <button class="tab-btn" onclick="changeTab('tab-drugs')">📚 شناسنامه دارو</button>
+    <button class="tab-btn active" onclick="changeTab('tab-calc')">🧮 تنظیم پمپ</button>
+    <button class="tab-btn" onclick="changeTab('tab-drugs')">📚 شناسنامه داروها</button>
     <button class="tab-btn" onclick="changeTab('tab-ysite')">🧪 تست لاین (Y-Site)</button>
   </div>
 
-  <!-- تب اول: محاسبه نرخ انفوزیون -->
+  <!-- تب ۱: محاسبه ریت پمپ سرنگ/انفوزیون -->
   <div id="tab-calc" class="tab-content">
     <div class="card">
       <div class="input-group">
-        <label>واحد اردر دوز:</label>
+        <label>واحد اردر دوز تجویزی:</label>
         <select id="unit" onchange="runCalculation()">
           <option value="mcg_kg_min">µg/kg/min (میکروگرم/کیلو/دقیقه)</option>
           <option value="mg_kg_min">mg/kg/min (میلی‌گرم/کیلو/دقیقه)</option>
@@ -288,6 +320,7 @@
       <div class="input-group" id="weight-wrapper">
         <label>وزن بیمار (کیلوگرم):</label>
         <div class="chips-row">
+          <div class="chip" onclick="setWeight(5)">۵ kg</div>
           <div class="chip" onclick="setWeight(10)">۱۰ kg</div>
           <div class="chip" onclick="setWeight(20)">۲۰ kg</div>
           <div class="chip active" onclick="setWeight(70)">۷۰ kg</div>
@@ -298,17 +331,17 @@
 
       <div style="display: flex; gap: 8px;">
         <div class="input-group" style="flex: 1;">
-          <label>کل دارو (mg):</label>
+          <label>کل دارو حل‌شده (mg):</label>
           <input type="number" id="drugmg" value="200" oninput="runCalculation()">
         </div>
         <div class="input-group" style="flex: 1;">
-          <label>حجم سرم (mL):</label>
+          <label>حجم کل سرم/سرنگ (mL):</label>
           <input type="number" id="fluid" value="50" oninput="runCalculation()">
         </div>
       </div>
 
       <div class="pump-visualizer">
-        <label style="font-size: 11px;">شبیه‌ساز غلظت و حجم سرنگ:</label>
+        <label style="font-size: 11px;">وضعیت بصری سرنگ پمپ و مایع:</label>
         <div class="syringe-body">
           <div class="syringe-liquid" id="liquid-progress" style="width: 50%;"></div>
         </div>
@@ -320,65 +353,68 @@
       </div>
 
       <div class="result-box">
-        <span style="font-size: 12px; color: var(--text-muted);">نرخ تنظیم سرنگ پمپ / انفوزیون:</span>
+        <span style="font-size: 12px; color: var(--text-muted);">تنظیم پمپ سرنگ / انفوزیون:</span>
         <div class="rate-val" id="res-rate">0.00</div>
         <span style="font-size: 12px; color: var(--accent);">میلی‌لیتر در ساعت (mL/h)</span>
-        <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);" id="res-drops">— قطره در دقیقه</div>
+        <div style="margin-top: 7px; font-size: 12px; color: var(--text-muted);" id="res-drops">— قطره در دقیقه</div>
       </div>
 
       <button class="btn-main" onclick="sendDataToBot()">
-        <span>📤 ارسال نتیجه به چت تلگرام</span>
+        📤 ارسال نتیجه به چت تلگرام
       </button>
     </div>
   </div>
 
-  <!-- تب دوم: شناسنامه داروها -->
+  <!-- تب ۲: شناسنامه داروها -->
   <div id="tab-drugs" class="tab-content" style="display: none;">
     <div class="card">
+      <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+        <button id="btn-cat-adult" class="chip active" style="flex:1; text-align:center;" onclick="switchAgeGroup('adult')">👨‍🦰 بزرگسالان</button>
+        <button id="btn-cat-peds" class="chip" style="flex:1; text-align:center;" onclick="switchAgeGroup('pediatric')">👶 اطفال و نوزادان</button>
+      </div>
+
       <div class="input-group">
-        <input type="text" id="drug-search" placeholder="🔍 جستجوی سریع نام دارو (فارسی/انگلیسی)..." oninput="filterDrugs()">
+        <input type="text" id="drug-search" placeholder="🔍 جستجوی نام دارو (مثال: دوپامین، پروپوفول، Atropine)..." oninput="filterDrugs()">
       </div>
-      <div id="drugs-list">
-        <!-- نمونه کارت‌های پویا -->
-        <div class="drug-card">
-          <div class="drug-title">
-            <span>دوپامین (Dopamine)</span>
-            <span class="badge-sub">اینوتروپ</span>
-          </div>
-          <div style="font-size: 12px; margin-top: 6px; color: var(--text-muted);">
-            دوز معمول: ۲ تا ۲۰ µg/kg/min | حلال سازگار: DW5% و NS
-          </div>
-        </div>
-        <div class="drug-card">
-          <div class="drug-title">
-            <span>نوراپی‌نفرین (Norepinephrine)</span>
-            <span class="badge-sub">وازوپرسور</span>
-          </div>
-          <div style="font-size: 12px; margin-top: 6px; color: var(--text-muted);">
-            دوز معمول: ۰.۰۱ تا ۳ µg/kg/min | ترجیح تزریق از طریق لاین مرکزی
-          </div>
-        </div>
+
+      <div id="loading-drugs" style="text-align: center; color: var(--text-muted); padding: 14px; font-size: 13px;">
+        ⏳ در حال بارگذاری بانک اطلاعات داروها...
       </div>
+
+      <div id="drugs-list"></div>
     </div>
   </div>
 
-  <!-- تب سوم: ناسازگاری‌های Y-Site -->
+  <!-- تب ۳: بررسی تداخلات و Y-Site -->
   <div id="tab-ysite" class="tab-content" style="display: none;">
     <div class="card">
       <div class="input-group">
-        <label>داروی تزریقی وریدی را وارد یا انتخاب کنید:</label>
-        <input type="text" id="ysite-input" placeholder="مثال: لیدوکائین، آتراکوریوم..." oninput="checkYSite()">
+        <label>نام داروی مورد نظر برای بررسی سازگاری مسیر تزریق و خطرات:</label>
+        <input type="text" id="ysite-input" placeholder="مثال: آتراکوریوم، لیدوکائین، فنتانیل..." oninput="checkCrossInteractions()">
       </div>
 
-      <div id="ysite-status" style="margin-top: 10px; display: none; padding: 12px; border-radius: 12px; font-size: 13px; line-height: 1.6;"></div>
+      <div id="ysite-status" style="margin-top: 10px; display: none; padding: 12px; border-radius: 12px; font-size: 13px; line-height: 1.7;"></div>
     </div>
   </div>
 
   <script>
-    // راه‌اندازی WebApp تلگرام
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
+
+    const DRUG_CLASSES_FA = {
+      "anesthesia": "💉 داروهای بیهوشی",
+      "antiarrhythmic": "🫀 آنتی‌آریتمی‌ها",
+      "antiemetic": "🤢 ضدتهوع و استفراغ",
+      "antibiotic": "🦠 آنتی‌بیوتیک‌ها",
+      "inotropes_vasopressors": "⚡ اینوتروپ‌ها و وازوپرسورها",
+      "others": "🩺 سایر داروها",
+      "Anticonvulsant": "🧠 ضدتشنج‌ها",
+      "Opioids": "مخدرها"
+    };
+
+    let currentAgeCategory = 'adult';
+    let drugsData = { adult: [], pediatric: [] };
 
     // تغییر تب‌ها
     function changeTab(tabId) {
@@ -388,7 +424,161 @@
       event.currentTarget.classList.add('active');
     }
 
-    // تنظیم سریع وزن
+    // سوییچ رده سنی داروها
+    function switchAgeGroup(group) {
+      currentAgeCategory = group;
+      document.getElementById('btn-cat-adult').classList.toggle('active', group === 'adult');
+      document.getElementById('btn-cat-peds').classList.toggle('active', group === 'pediatric');
+      filterDrugs();
+    }
+
+    // لود خودکار فایل‌های JSON
+    async function loadAllDatabases() {
+      const loadingElem = document.getElementById('loading-drugs');
+      try {
+        const [adultRes, pedsRes] = await Promise.allSettled([
+          fetch('./drugs.json'),
+          fetch('./pediatric_drugs.json')
+        ]);
+
+        if (adultRes.status === 'fulfilled' && adultRes.value.ok) {
+          const adultJson = await adultRes.value.json();
+          drugsData.adult = parseDrugsObject(adultJson);
+        }
+
+        if (pedsRes.status === 'fulfilled' && pedsRes.value.ok) {
+          const pedsJson = await pedsRes.value.json();
+          drugsData.pediatric = parseDrugsObject(pedsJson);
+        }
+
+        loadingElem.style.display = 'none';
+        filterDrugs();
+      } catch (e) {
+        loadingElem.innerHTML = '⚠️ خطا در لود دیتابیس JSON. فایل‌ها باید در ریشه ریپازیتوری باشند.';
+        loadingElem.style.color = 'var(--danger)';
+      }
+    }
+
+    function parseDrugsObject(rawObj) {
+      return Object.entries(rawObj).map(([key, val]) => ({
+        key: key,
+        fa_name: val.fa_name || key,
+        name: val.name || '',
+        category: val.category || 'others',
+        min_dose: val.min_dose || '-',
+        max_dose: val.max_dose || '-',
+        unit: val.unit || '',
+        titration: val.titration || '',
+        admin: val.administration || '',
+        solutions: val.solutions_compatible || 'ثبت نشده',
+        contra: val.contraindications || 'ثبت نشده',
+        side_effects: val.side_effects || '',
+        y_site: val.y_site_incompatible || '',
+        interactions: val.interactions || {}
+      }));
+    }
+
+    // رندر کارت‌های داروها به صورت آکاردئونی
+    function renderDrugList(list) {
+      const container = document.getElementById('drugs-list');
+      container.innerHTML = '';
+
+      if (list.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:12px;">دارویی یافت نشد.</div>';
+        return;
+      }
+
+      list.forEach((d, idx) => {
+        const card = document.createElement('div');
+        card.className = 'drug-card';
+        const classTitle = DRUG_CLASSES_FA[d.category] || d.category;
+
+        card.innerHTML = `
+          <div class="drug-header" onclick="toggleAccordion(${idx})">
+            <div>
+              <div class="drug-title-text">💊 ${d.fa_name}</div>
+              <div class="drug-en-text">${d.name}</div>
+            </div>
+            <span class="badge-sub">${classTitle}</span>
+          </div>
+          <div class="drug-body" id="drug-body-${idx}">
+            <div class="drug-detail-row">🎯 <b>محدوده دوز مجاز:</b> <code>${d.min_dose}</code> تا <code>${d.max_dose}</code> ${d.unit}</div>
+            ${d.titration ? `<div class="drug-detail-row">🔄 <b>دستور تیتر:</b> ${d.titration}</div>` : ''}
+            ${d.admin ? `<div class="drug-detail-row">💉 <b>نحوه تجویز:</b> ${d.admin}</div>` : ''}
+            <div class="drug-detail-row">✅ <b>حلال‌های سازگار:</b> ${d.solutions}</div>
+            <div class="drug-detail-row" style="color:#fca5a5;">🚫 <b>منع مصرف:</b> ${d.contra}</div>
+            ${d.y_site ? `<div class="drug-detail-row" style="color:#fecdd3;">🧪 <b>ناسازگاری Y-site:</b> ${d.y_site}</div>` : ''}
+            ${d.side_effects ? `<div class="drug-detail-row">🩺 <b>عوارض پرخطر:</b> ${d.side_effects}</div>` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleAccordion(idx) {
+      const body = document.getElementById(`drug-body-${idx}`);
+      body.style.display = body.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function filterDrugs() {
+      const q = document.getElementById('drug-search').value.toLowerCase().trim();
+      const currentList = drugsData[currentAgeCategory] || [];
+      if (!q) {
+        renderDrugList(currentList);
+        return;
+      }
+      const filtered = currentList.filter(d => 
+        d.fa_name.toLowerCase().includes(q) || 
+        d.name.toLowerCase().includes(q) || 
+        d.key.toLowerCase().includes(q)
+      );
+      renderDrugList(filtered);
+    }
+
+    // پایشگر متقاطع تداخلات و Y-Site
+    function checkCrossInteractions() {
+      const q = document.getElementById('ysite-input').value.toLowerCase().trim();
+      const box = document.getElementById('ysite-status');
+      if (!q) {
+        box.style.display = 'none';
+        return;
+      }
+
+      let ySiteHits = [];
+      let contraHits = [];
+
+      const pool = [...drugsData.adult, ...drugsData.pediatric];
+      pool.forEach(d => {
+        if (d.y_site && d.y_site.toLowerCase().includes(q)) {
+          ySiteHits.push(`• <b>${d.fa_name}</b>: ${d.y_site}`);
+        }
+        if (d.contra && d.contra.toLowerCase().includes(q)) {
+          contraHits.push(`• <b>${d.fa_name}</b>: ${d.contra}`);
+        }
+      });
+
+      box.style.display = 'block';
+      if (ySiteHits.length > 0 || contraHits.length > 0) {
+        box.style.background = 'rgba(244, 63, 94, 0.14)';
+        box.style.border = '1px solid var(--danger)';
+        box.style.color = '#fecdd3';
+        let html = '';
+        if (ySiteHits.length > 0) {
+          html += `⚠️ <b>هشدار رسوب یا ناسازگاری قطعی لاین تزریق (Y-Site):</b><br>${ySiteHits.join('<br>')}<br><br>`;
+        }
+        if (contraHits.length > 0) {
+          html += `🚫 <b>موارد منع مصرف مشترک:</b><br>${contraHits.join('<br>')}`;
+        }
+        box.innerHTML = html;
+      } else {
+        box.style.background = 'rgba(16, 185, 129, 0.14)';
+        box.style.border = '1px solid var(--success)';
+        box.style.color = '#a7f3d0';
+        box.innerHTML = `✅ برای عبارت «${q}» ناسازگاری ثبت‌شده‌ای در پایگاه داده فعلی یافت نشد.`;
+      }
+    }
+
+    // محاسبات پمپ
     function setWeight(val) {
       document.getElementById('weight').value = val;
       document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -396,7 +586,6 @@
       runCalculation();
     }
 
-    // موتور محاسبات پمپ
     function runCalculation() {
       const unit = document.getElementById('unit').value;
       const dose = parseFloat(document.getElementById('dose').value) || 0;
@@ -418,12 +607,10 @@
       document.getElementById('res-rate').innerText = formattedRate;
       document.getElementById('res-drops').innerText = `${Math.round(rate)} قطره در دقیقه (میکروست ۶۰)`;
 
-      // تغییر طول بصری سرنگ
       const liquidPercent = Math.min(100, Math.max(10, (fluidMl / 100) * 100));
       document.getElementById('liquid-progress').style.width = liquidPercent + '%';
     }
 
-    // ارسال دیتای محاسبه به ربات تلگرام
     function sendDataToBot() {
       const data = {
         action: "calc_result",
@@ -436,52 +623,7 @@
       tg.sendData(JSON.stringify(data));
     }
 
-    // شبیه‌ساز پایگاه‌داده تداخل لاین Y-site
-    const ySiteDatabase = {
-      "آتراکوریوم": "🚫 با بی‌کربنات سدیم (جوش شیرین) ناسازگار است و فوراً رسوب می‌کند.",
-      "میدازولام": "🚫 با دگزامتازون و سدیم بی‌کربنات رسوب می‌دهد.",
-      "فنتانیل": "✅ با لیدوکائین، کتامین و اتومیدات در لاین Y-Site سازگار است.",
-      "پروپوفول": "⚠️ با داروهای بسیار اسیدی یا املاح کلسیم مخلوط نشود؛ خطر بی‌ثباتی امولسیون."
-    };
-
-    function checkYSite() {
-      const q = document.getElementById('ysite-input').value.trim();
-      const statusBox = document.getElementById('ysite-status');
-      if (!q) {
-        statusBox.style.display = 'none';
-        return;
-      }
-
-      let found = false;
-      for (const [drug, desc] of Object.entries(ySiteDatabase)) {
-        if (drug.includes(q)) {
-          statusBox.style.display = 'block';
-          statusBox.style.background = 'rgba(244, 63, 94, 0.15)';
-          statusBox.style.border = '1px solid var(--danger)';
-          statusBox.style.color = '#fecdd3';
-          statusBox.innerHTML = `<b>دارو: ${drug}</b><br>${desc}`;
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        statusBox.style.display = 'block';
-        statusBox.style.background = 'rgba(16, 185, 129, 0.15)';
-        statusBox.style.border = '1px solid var(--success)';
-        statusBox.style.color = '#a7f3d0';
-        statusBox.innerHTML = `تداخل بحرانی ثبت‌شده‌ای برای «${q}» در این دمو یافت نشد.`;
-      }
-    }
-
-    function filterDrugs() {
-      const q = document.getElementById('drug-search').value.toLowerCase();
-      const items = document.querySelectorAll('.drug-card');
-      items.forEach(item => {
-        item.style.display = item.innerText.toLowerCase().includes(q) ? 'block' : 'none';
-      });
-    }
-
+    loadAllDatabases();
     runCalculation();
   </script>
 </body>
