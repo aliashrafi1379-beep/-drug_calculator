@@ -5,86 +5,331 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>راهنمای جامع بالینی داروها</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- بارگذاری فونت استاندارد فارسی وزیرمتن -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: var(--tg-theme-bg-color, #0f172a);
-      --text: var(--tg-theme-text-color, #f8fafc);
-      --card-bg: var(--tg-theme-secondary-bg-color, #1e293b);
-      --primary: var(--tg-theme-button-color, #0284c7);
-      --primary-text: var(--tg-theme-button-text-color, #ffffff);
-      --accent-red: #ef4444;
-      --accent-yellow: #f59e0b;
-      --border: #334155;
+      --bg: #0f172a;
+      --text: #f8fafc;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-text: #ffffff;
+      --accent-title: #38bdf8;
+      --input-bg: #1e293b;
+      --modal-bg: rgba(15, 23, 42, 0.98);
+      --badge-bg: rgba(56, 189, 248, 0.1);
     }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
-    body { background-color: var(--bg); color: var(--text); padding: 14px; font-size: 14px; line-height: 1.6; }
-    
-    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+
+    [data-theme="light"] {
+      --bg: #f1f5f9;
+      --text: #0f172a;
+      --card-bg: #ffffff;
+      --card-border: #cbd5e1;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-text: #ffffff;
+      --accent-title: #0284c7;
+      --input-bg: #ffffff;
+      --modal-bg: rgba(248, 250, 252, 0.98);
+      --badge-bg: rgba(2, 132, 199, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* هدر با دکمه تم شب و روز */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .page-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--accent-title);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .theme-toggle-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* تب‌های رده سنی */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
     .tab-btn {
-      flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--card-bg); color: var(--text); cursor: pointer; font-weight: bold;
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .tab-btn.active { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
 
+    .tab-btn.active {
+      background: var(--primary);
+      color: var(--primary-text);
+      border-color: var(--primary);
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    }
+
+    /* باکس سرچ */
     .search-box {
-      width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--card-bg); color: var(--text); outline: none; margin-bottom: 14px;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text);
+      outline: none;
+      margin-bottom: 14px;
+      font-size: 13.5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
-    .cat-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+    .search-box:focus {
+      border-color: var(--accent-title);
+    }
+
+    /* دسته‌بندی‌ها (چیپ‌ها) */
+    .cat-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+
+    .cat-chips::-webkit-scrollbar {
+      display: none;
+    }
+
     .chip {
-      white-space: nowrap; padding: 6px 12px; border-radius: 16px; background: var(--card-bg);
-      border: 1px solid var(--border); font-size: 12px; cursor: pointer;
+      white-space: nowrap;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
     }
-    .chip.active { background: var(--primary); color: #fff; }
 
-    .drug-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .chip.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* شبکه کارت داروها */
+    .drug-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
     .drug-card {
-      background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
-      padding: 12px; cursor: pointer; transition: transform 0.1s;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
-    .drug-card:active { transform: scale(0.98); }
-    .drug-card h4 { font-size: 14px; margin-bottom: 4px; color: #38bdf8; }
-    .drug-card span { font-size: 11px; opacity: 0.7; }
 
-    /* Modal / Detail View */
+    .drug-card:active {
+      transform: scale(0.97);
+    }
+
+    .drug-card h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--accent-title);
+    }
+
+    .drug-card span {
+      font-size: 11px;
+      opacity: 0.75;
+      font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* صفحه مودال مشخصات */
     #detail-view {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--bg); padding: 16px; overflow-y: auto; z-index: 100;
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--modal-bg);
+      backdrop-filter: blur(8px);
+      padding: 16px;
+      overflow-y: auto;
+      z-index: 100;
     }
+
     .section-box {
-      background: var(--card-bg); border-radius: 8px; padding: 12px;
-      margin-top: 10px; border: 1px solid var(--border);
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
-    .section-title { font-weight: bold; font-size: 13px; color: #38bdf8; margin-bottom: 4px; }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--accent-title);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: justify;
+    }
+
     .back-btn {
-      margin-bottom: 12px; padding: 6px 14px; background: var(--card-bg);
-      border: 1px solid var(--border); border-radius: 6px; color: var(--text); cursor: pointer;
+      margin-bottom: 14px;
+      padding: 8px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .detail-header-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
   </style>
 </head>
 <body>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchAge('adult')">👨‍🦰 بزرگسالان</button>
-    <button class="tab-btn" onclick="switchAge('pediatric')">👶 اطفال</button>
+  <div class="top-bar">
+    <div class="page-title">
+      <span>💉</span>
+      <span>راهنمای جامع داروها</span>
+    </div>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span>
+      <span id="themeLabel">روز</span>
+    </button>
   </div>
 
-  <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی نام دارو..." oninput="filterDrugs()">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchAge('adult')">👨‍🦰 بزرگسالان</button>
+    <button class="tab-btn" onclick="switchAge('pediatric')">👶 اطفال و نوزادان</button>
+  </div>
+
+  <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی نام فارسی، ژنریک یا برند..." oninput="filterDrugs()">
 
   <div class="cat-chips" id="catChips"></div>
 
   <div class="drug-grid" id="drugList"></div>
 
-  <!-- صفحه نمایش شناسنامه دارو -->
+  <!-- شناسنامه کامل دارو -->
   <div id="detail-view">
-    <button class="back-btn" onclick="closeDetail()">🔙 بازگشت به لیست</button>
+    <button class="back-btn" onclick="closeDetail()">🔙 بازگشت به فهرست</button>
     <div id="detail-content"></div>
   </div>
 
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) { tg.expand(); tg.ready(); }
+    if (tg) {
+      tg.expand();
+      tg.ready();
+    }
+
+    // مدیریت تم تیره / روشن
+    function initTheme() {
+      const savedTheme = localStorage.getItem('app_theme') || (tg?.colorScheme || 'dark');
+      applyTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const target = current === 'dark' ? 'light' : 'dark';
+      applyTheme(target);
+      localStorage.setItem('app_theme', target);
+    }
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.getElementById('themeIcon').innerText = '🌙';
+        document.getElementById('themeLabel').innerText = 'شب';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.getElementById('themeIcon').innerText = '☀️';
+        document.getElementById('themeLabel').innerText = 'روز';
+      }
+    }
+
+    initTheme();
 
     let currentAge = 'adult';
     let currentCat = 'all';
@@ -97,13 +342,12 @@
       "antiarrhythmic": "🫀 آنتی‌آریتمی",
       "antiemetic": "🤢 ضدتهوع",
       "antibiotic": "🦠 آنتی‌بیوتیک",
-      "inotropes_vasopressors": "⚡ اینوتروپ/وازوپرسور",
+      "inotropes_vasopressors": "⚡ وازوپرسور/اینوتروپ",
       "Anticonvulsant": "🧠 ضدتشنج",
       "Opioids": "مخدرها",
       "others": "🩺 سایر"
     };
 
-    // بارگذاری فایل‌های دیتابیس جیسون
     async function loadData() {
       try {
         const resA = await fetch('drugs.json');
@@ -150,7 +394,13 @@
       const drugs = drugsCache[currentAge] || {};
       list.innerHTML = '';
 
-      for (const [key, item] of Object.entries(drugs)) {
+      const entries = Object.entries(drugs);
+      if (entries.length === 0) {
+        list.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 24px; opacity: 0.6;">داده‌ای برای نمایش یافت نشد.</div>';
+        return;
+      }
+
+      for (const [key, item] of entries) {
         const faName = item.fa_name || key;
         const enName = item.name || '';
         const cat = item.category || 'others';
@@ -179,25 +429,31 @@
       const dc = document.getElementById('detail-content');
 
       const secKeys = [
-        { t: "🎯 محدوده دوز", v: `${item.min_dose || '-'} تا ${item.max_dose || '-'} ${item.unit || ''}` },
+        { t: "🎯 محدوده دوز مجاز", v: `${item.min_dose || '-'} تا ${item.max_dose || '-'} ${item.unit || ''}` },
         { t: "📦 اشکال و غلظت دارویی", v: item.forms_and_concentrations },
         { t: "🔄 دستور تیتر و اثرات بالینی", v: item.titration },
-        { t: "💉 نحوه تجویز و تزریق", v: item.administration },
-        { t: "✅ حلال‌ها و سازگاری", v: item.solutions_compatible },
-        { t: "🚫 موارد منع مصرف", v: item.contraindications },
+        { t: "💉 نحوه و مسیر تجویز", v: item.administration },
+        { t: "✅ حلال‌ها و سازگاری سرمی", v: item.solutions_compatible },
+        { t: "🚫 موارد منع مصرف قطعی", v: item.contraindications },
         { t: "🫄 بارداری و شیردهی", v: item.pregnancy_lactation },
         { t: "🩺 عوارض جانبی پرخطر", v: item.side_effects },
-        { t: "⚠️ هشدارها و نکات حیاتی", v: item.notes },
-        { t: "🧪 ناسازگاری‌های لاین (Y-Site)", v: item.y_site_incompatible }
+        { t: "⚠️ هشدارها و نکات کلیدی", v: item.notes },
+        { t: "🧪 ناسازگاری‌های لاین تزریق (Y-Site)", v: item.y_site_incompatible }
       ];
 
-      let html = `<h2 style="color:#38bdf8;">${faName}</h2><p style="opacity:0.8; margin-bottom:12px;"><i>${enName}</i></p>`;
+      let html = `
+        <div class="detail-header-card">
+          <h2 style="color:var(--accent-title); font-size:18px; margin-bottom:4px;">💊 ${faName}</h2>
+          <p style="opacity:0.8; font-size:13px;"><i>${enName}</i></p>
+        </div>
+      `;
+
       for (const sec of secKeys) {
         if (sec.v) {
           html += `
             <div class="section-box">
               <div class="section-title">${sec.t}</div>
-              <div>${sec.v}</div>
+              <div class="section-desc">${sec.v}</div>
             </div>
           `;
         }
