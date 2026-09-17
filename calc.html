@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>راهنمای جامع بالینی داروها</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: var(--tg-theme-bg-color, #0f172a);
+      --text: var(--tg-theme-text-color, #f8fafc);
+      --card-bg: var(--tg-theme-secondary-bg-color, #1e293b);
+      --primary: var(--tg-theme-button-color, #0284c7);
+      --primary-text: var(--tg-theme-button-text-color, #ffffff);
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text); padding: 14px; font-size: 14px; line-height: 1.6; }
+    
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tab-btn {
+      flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--card-bg); color: var(--text); cursor: pointer; font-weight: bold;
+    }
+    .tab-btn.active { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+
+    .search-box {
+      width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--card-bg); color: var(--text); outline: none; margin-bottom: 14px;
+    }
+
+    .cat-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+    .chip {
+      white-space: nowrap; padding: 6px 12px; border-radius: 16px; background: var(--card-bg);
+      border: 1px solid var(--border); font-size: 12px; cursor: pointer;
+    }
+    .chip.active { background: var(--primary); color: #fff; }
+
+    .drug-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .drug-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; cursor: pointer; transition: transform 0.1s;
+    }
+    .drug-card:active { transform: scale(0.98); }
+    .drug-card h4 { font-size: 14px; margin-bottom: 4px; color: #38bdf8; }
+    .drug-card span { font-size: 11px; opacity: 0.7; }
+
+    /* Modal / Detail View */
+    #detail-view {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg); padding: 16px; overflow-y: auto; z-index: 100;
+    }
+    .section-box {
+      background: var(--card-bg); border-radius: 8px; padding: 12px;
+      margin-top: 10px; border: 1px solid var(--border);
+    }
+    .section-title { font-weight: bold; font-size: 13px; color: #38bdf8; margin-bottom: 4px; }
+    .back-btn {
+      margin-bottom: 12px; padding: 6px 14px; background: var(--card-bg);
+      border: 1px solid var(--border); border-radius: 6px; color: var(--text); cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchAge('adult')">👨‍🦰 بزرگسالان</button>
+    <button class="tab-btn" onclick="switchAge('pediatric')">👶 اطفال</button>
+  </div>
+
+  <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی نام دارو..." oninput="filterDrugs()">
+
+  <div class="cat-chips" id="catChips"></div>
+
+  <div class="drug-grid" id="drugList"></div>
+
+  <!-- صفحه نمایش شناسنامه دارو -->
+  <div id="detail-view">
+    <button class="back-btn" onclick="closeDetail()">🔙 بازگشت به لیست</button>
+    <div id="detail-content"></div>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.expand(); tg.ready(); }
+
+    let currentAge = 'adult';
+    let currentCat = 'all';
+    let drugsCache = { adult: {}, pediatric: {} };
+
+    const drugClasses = {
+      "all": "همه داروها",
+      "antidotes": "🛡️ آنتی‌دوت‌ها",
+      "anesthesia": "💉 بیهوشی",
+      "antiarrhythmic": "🫀 آنتی‌آریتمی",
+      "antiemetic": "🤢 ضدتهوع",
+      "antibiotic": "🦠 آنتی‌بیوتیک",
+      "inotropes_vasopressors": "⚡ اینوتروپ/وازوپرسور",
+      "Anticonvulsant": "🧠 ضدتشنج",
+      "Opioids": "مخدرها",
+      "others": "🩺 سایر"
+    };
+
+    // بارگذاری فایل‌های دیتابیس جیسون
+    async function loadData() {
+      try {
+        const resA = await fetch('drugs.json');
+        drugsCache.adult = await resA.json();
+      } catch (e) { console.warn("Adult DB load failed", e); }
+
+      try {
+        const resP = await fetch('pediatric_drugs.json');
+        drugsCache.pediatric = await resP.json();
+      } catch (e) { console.warn("Pediatric DB load failed", e); }
+
+      renderCategories();
+      renderDrugs();
+    }
+
+    function switchAge(age) {
+      currentAge = age;
+      document.querySelectorAll('.tab-btn').forEach((b, idx) => {
+        b.classList.toggle('active', (age === 'adult' && idx === 0) || (age === 'pediatric' && idx === 1));
+      });
+      renderDrugs();
+    }
+
+    function renderCategories() {
+      const container = document.getElementById('catChips');
+      container.innerHTML = '';
+      for (const [key, label] of Object.entries(drugClasses)) {
+        const chip = document.createElement('div');
+        chip.className = `chip ${key === currentCat ? 'active' : ''}`;
+        chip.innerText = label;
+        chip.onclick = () => {
+          currentCat = key;
+          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          renderDrugs();
+        };
+        container.appendChild(chip);
+      }
+    }
+
+    function renderDrugs() {
+      const list = document.getElementById('drugList');
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const drugs = drugsCache[currentAge] || {};
+      list.innerHTML = '';
+
+      for (const [key, item] of Object.entries(drugs)) {
+        const faName = item.fa_name || key;
+        const enName = item.name || '';
+        const cat = item.category || 'others';
+
+        if (currentCat !== 'all') {
+          const matchCat = Array.isArray(cat) ? cat.includes(currentCat) : cat === currentCat;
+          if (!matchCat) continue;
+        }
+
+        if (q && !faName.toLowerCase().includes(q) && !enName.toLowerCase().includes(q) && !key.toLowerCase().includes(q)) {
+          continue;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'drug-card';
+        card.innerHTML = `<h4>💊 ${faName}</h4><span>${enName}</span>`;
+        card.onclick = () => openDetail(item, faName, enName);
+        list.appendChild(card);
+      }
+    }
+
+    function filterDrugs() { renderDrugs(); }
+
+    function openDetail(item, faName, enName) {
+      const dv = document.getElementById('detail-view');
+      const dc = document.getElementById('detail-content');
+
+      const secKeys = [
+        { t: "🎯 محدوده دوز", v: `${item.min_dose || '-'} تا ${item.max_dose || '-'} ${item.unit || ''}` },
+        { t: "📦 اشکال و غلظت دارویی", v: item.forms_and_concentrations },
+        { t: "🔄 دستور تیتر و اثرات بالینی", v: item.titration },
+        { t: "💉 نحوه تجویز و تزریق", v: item.administration },
+        { t: "✅ حلال‌ها و سازگاری", v: item.solutions_compatible },
+        { t: "🚫 موارد منع مصرف", v: item.contraindications },
+        { t: "🫄 بارداری و شیردهی", v: item.pregnancy_lactation },
+        { t: "🩺 عوارض جانبی پرخطر", v: item.side_effects },
+        { t: "⚠️ هشدارها و نکات حیاتی", v: item.notes },
+        { t: "🧪 ناسازگاری‌های لاین (Y-Site)", v: item.y_site_incompatible }
+      ];
+
+      let html = `<h2 style="color:#38bdf8;">${faName}</h2><p style="opacity:0.8; margin-bottom:12px;"><i>${enName}</i></p>`;
+      for (const sec of secKeys) {
+        if (sec.v) {
+          html += `
+            <div class="section-box">
+              <div class="section-title">${sec.t}</div>
+              <div>${sec.v}</div>
+            </div>
+          `;
+        }
+      }
+
+      dc.innerHTML = html;
+      dv.style.display = 'block';
+    }
+
+    function closeDetail() {
+      document.getElementById('detail-view').style.display = 'none';
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
